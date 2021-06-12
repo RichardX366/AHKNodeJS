@@ -32,15 +32,15 @@ Loop {
     MouseMove, data[2], data[3], data[4]
     write("done")
   } else if (data[1] = "click") {
-    MouseClick, % data[2],,,,% data[3]
+    Click % data[2]
+    write("done")
+  } else if (data[1] = "clickPlay") {
+    SendPlay % "{Click" data[2] "}"
     write("done")
   } else if (data[1] = "getClipboard") {
     write(clipboard)
   } else if (data[1] = "setClipboard") {
     clipboard = % data[2]
-    write("done")
-  } else if (data[1] = "send") {
-    Send % data[2]
     write("done")
   } else if (data[1] = "pixelSearch") {
     PixelSearch, x, y, data[2], data[3], data[4], data[5], data[6], data[7], Fast RGB
@@ -57,11 +57,17 @@ Loop {
   } else if (data[1] = "setKeyDelay") {
     setKeyDelay, data[2], data[3], % data[4]
     write("done")
+  } else if (data[1] = "send") {
+    Send % data[2]
+    write("done")
   } else if (data[1] = "sendInput") {
     SendInput % data[2]
     write("done")
   } else if (data[1] = "sendPlay") {
     SendPlay % data[2]
+    write("done")
+  } else if (data[1] = "setMouseSpeed") {
+    SetDefaultMouseSpeed % data[2]
     write("done")
   }
 }

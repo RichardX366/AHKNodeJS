@@ -37,6 +37,8 @@ module.exports = async function(path, hotkeysList, options) {
   const ahk = {
     defaultColorVariation: 0,
     hotkeysList: hotkeysList,
+    width: 1366,
+    height: 768,
     current: null,
     hotkeys: {},
     hotkeysPending: [],
@@ -61,7 +63,7 @@ module.exports = async function(path, hotkeysList, options) {
      * @param {string | object} key - The hotkey to bind
      * @param {function} run - The function to run on bind
      */
-    setHotkey: function(key, run) {
+    setHotkey(key, run) {
       var ahkKey;
       if (typeof key === "string") ahkKey = key;
       else {
@@ -76,7 +78,9 @@ module.exports = async function(path, hotkeysList, options) {
             .replace("shift", "+")
             .replace("any", "*")
           }
-          ahkKey = mod + key.key;
+          ahkKey = mod + key.key
+          .replace(/\\{/g, "{{}")
+          .replace(/\\}/g, "{}}");
         }
       }
       ahk.hotkeys[ahkKey] = run;
@@ -86,7 +90,7 @@ module.exports = async function(path, hotkeysList, options) {
      * @param {number} x - The time in ms to sleep for
      * @returns A promise that is fufilled once the time is up
      */
-    sleep: function(x) {
+    sleep(x) {
       return new Promise(function(resolve) {
         setTimeout(resolve, x);
       });
@@ -94,7 +98,7 @@ module.exports = async function(path, hotkeysList, options) {
     /**
      * Runs a hotkey if one is detected
      */
-    waitForInterrupt: async function() {
+    async waitForInterrupt() {
       while (ahk.hotkeysPending[0]) {
         await ahk.hotkeys[ahk.hotkeysPending[0]]();
         ahk.hotkeysPending.shift();
@@ -109,8 +113,8 @@ module.exports = async function(path, hotkeysList, options) {
      *  positioning?: number
      * }} x - The Parameters
      */
-    mouseMove: async function(x) {
-      if (!x.time) x.time = 2;
+    async mouseMove(x) {
+      if (!x.time) x.time = "";
       if (x.positioning === "%") {
         x.x = Math.floor(x.x / 100 * ahk.width);
         x.y = Math.floor(x.y / 100 * ahk.height);
@@ -121,19 +125,35 @@ module.exports = async function(path, hotkeysList, options) {
     /**
      * Clicks the mouse. Look at the documentation for information on parameters.
      * @param {{
+     *  x?: number,
+     *  y?: number,
+     *  positioning?: string
      *  button?: string,
-     *  state?: string
-     * }} x 
+     *  state?: string,
+     *  count?: number
+     * }} x - The parameters
      */
-    click: async function(x) {
+    async click(x) {
       if (!x) {
         x = {};
       }
-      if (!x.button) x.button = "left";
+      if (!x.x || !x.y) {
+        x.x = "";
+        x.y = "";
+      }
+      if (x.positioning === "%" && x.x) {
+        x.x = Math.floor(x.x / 100 * ahk.width);
+        x.y = Math.floor(x.y / 100 * ahk.height);
+      }
+      if (x.button === "left") x.button = "L";
+      else if (x.button === "middle") x.button = "M";
+      else if (x.button === "right") x.button = "R";
+      else x.button = "";
       if (x.state === "down") x.state = "D";
       else if (x.state === "up") x.state = "U";
       else x.state = "";
-      runner.stdin.write(`click;${x.button};${x.state}\n`);
+      if (!x.count) x.count = "";
+      runner.stdin.write(`click;${x.x} ${x.y} ${x.button} ${x.state} ${x.count}\n`);
       await wait();
     },
     /**
@@ -141,7 +161,7 @@ module.exports = async function(path, hotkeysList, options) {
      * @param {string} [x] - If provided, the clipboard is set to the value
      * @returns The clipboard if no parameters are passed in
      */
-    clipboard: async function(x) {
+    async clipboard(x) {
       if (x) {
         runner.stdin.write(`setClipboard;${x}\n`);
         await wait();
@@ -149,24 +169,6 @@ module.exports = async function(path, hotkeysList, options) {
         runner.stdin.write(`getClipboard\n`);
         return await wait();
       }
-    },
-    /**
-     * Types out a string. Look at documentation for extra information.
-     * @param {string} x - The string to send
-     */
-    send: async function(x) {
-      var toSend = "";
-      if (x.blind) toSend += "{Blind}";
-      toSend += x.msg
-      .replace(/!/g, "{!}")
-      .replace(/#/g, "{#}")
-      .replace(/\+/g, "{+}")
-      .replace(/\^/g, "{^}")
-      .replace(/\\{/g, "{{}")
-      .replace(/\\}/g, "{}}")
-      .replace(/\n/g, "{Enter}");
-      runner.stdin.write(`send;${toSend}\n`);
-      await wait();
     },
     /**
      * Searches for a pixel of set color
@@ -180,7 +182,7 @@ module.exports = async function(path, hotkeysList, options) {
      * }} x - The parameters
      * @returns If found, [x, y]. If % positioning is used, it returns them as screen percents.
      */
-    pixelSearch: async function(x) {
+    async pixelSearch(x) {
       if (!x.variation) x.variation = ahk.defaultColorVariation;
       if (x.positioning === "%") {
         x.x1 = Math.floor(x.x1 / 100 * ahk.width);
@@ -209,7 +211,7 @@ module.exports = async function(path, hotkeysList, options) {
      * }} x - The parameters
      * @returns The pixel's color in hex RGB
      */
-    getPixelColor: async function(x) {
+    async getPixelColor(x) {
       if (x.positioning === "%") {
         x.x = Math.floor(x.x / 100 * ahk.width);
         x.y = Math.floor(x.y / 100 * ahk.height);
@@ -229,7 +231,7 @@ module.exports = async function(path, hotkeysList, options) {
      * @param {string} [x] 
      * @returns [x, y] If % positioning is used, they are returned as screen percents.
      */
-    getMousePos: async function(x) {
+    async getMousePos(x) {
       runner.stdin.write(`getMousePos\n`);
       var pos = (await wait()).split(" ");
       if (x === "%") {
@@ -251,7 +253,7 @@ module.exports = async function(path, hotkeysList, options) {
      * }} x - The parameters
      * @returns If found, [x, y]. If % positioning is used, it returns them as screen percents.
      */
-    imageSearch: async function(x) {
+    async imageSearch(x) {
       if (!x.variation) x.variation = ahk.defaultColorVariation;
       else x.variation = `*${x.variation} `;
       if (!x.trans) x.trans = "";
@@ -281,7 +283,7 @@ module.exports = async function(path, hotkeysList, options) {
      *  play?: number
      * }} x - The parameters
      */
-    setKeyDelay: async function(x) {
+    async setKeyDelay(x) {
       if (!x.delay) x.delay = "";
       if (!x.duration) x.duration = "";
       if (x.play) x.play = "Play";
@@ -290,11 +292,11 @@ module.exports = async function(path, hotkeysList, options) {
       await wait();
     },
     /**
-     * Types out a string using SendInput. Look at documentation for extra information.
+     * Types out a string. Look at documentation for extra information.
      * @param {string} x - The string to send
      */
-    sendInput: async function(x) {
-      var toSend = "";
+    async send(x) {
+      var toSend = "{Text}";
       if (x.blind) toSend += "{Blind}";
       toSend += x.msg
       .replace(/!/g, "{!}")
@@ -302,8 +304,24 @@ module.exports = async function(path, hotkeysList, options) {
       .replace(/\+/g, "{+}")
       .replace(/\^/g, "{^}")
       .replace(/\\{/g, "{{}")
-      .replace(/\\}/g, "{}}")
-      .replace(/\n/g, "{Enter}");
+      .replace(/\\}/g, "{}}");
+      runner.stdin.write(`send;${toSend}\n`);
+      await wait();
+    },
+    /**
+     * Types out a string using SendInput. Look at documentation for extra information.
+     * @param {string} x - The string to send
+     */
+    async sendInput(x) {
+      var toSend = "{Text}";
+      if (x.blind) toSend += "{Blind}";
+      toSend += x.msg
+      .replace(/!/g, "{!}")
+      .replace(/#/g, "{#}")
+      .replace(/\+/g, "{+}")
+      .replace(/\^/g, "{^}")
+      .replace(/\\{/g, "{{}")
+      .replace(/\\}/g, "{}}");
       runner.stdin.write(`sendInput;${toSend}\n`);
       await wait();
     },
@@ -311,8 +329,8 @@ module.exports = async function(path, hotkeysList, options) {
      * Types out a string using SendPlay. Look at documentation for extra information.
      * @param {string} x - The string to send
      */
-    sendPlay: async function(x) {
-      var toSend = "";
+    async sendPlay(x) {
+      var toSend = "{Text}";
       if (x.blind) toSend += "{Blind}";
       toSend += x.msg
       .replace(/!/g, "{!}")
@@ -320,9 +338,16 @@ module.exports = async function(path, hotkeysList, options) {
       .replace(/\+/g, "{+}")
       .replace(/\^/g, "{^}")
       .replace(/\\{/g, "{{}")
-      .replace(/\\}/g, "{}}")
-      .replace(/\n/g, "{Enter}");
+      .replace(/\\}/g, "{}}");
       runner.stdin.write(`sendPlay;${toSend}\n`);
+      await wait();
+    },
+    /**
+     * Sets the default mouse speed for clicks and mouseMove
+     * @param {number} x - The mouse speed from 0 - 100
+     */
+    async setMouseSpeed(x) {
+      runner.stdin.write(`setMouseSpeed;${x}\n`);
       await wait();
     }
   };
@@ -362,8 +387,11 @@ write(x) {
           .replace("shift", "+")
           .replace("any", "*")
         }
-        ahk.hotkeys[mod + x.key] = function() {};
-        hotkeysString += `${mod + x.key}::write("${mod + x.key}")
+        var key = x.key
+        .replace(/\\{/g, "{{}")
+        .replace(/\\}/g, "{}}");
+        ahk.hotkeys[mod + key] = function() {};
+        hotkeysString += `${mod + key}::write("${mod + key}")
   `;
       }
     }
