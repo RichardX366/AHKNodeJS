@@ -372,6 +372,30 @@ Sets the default mouse speed to the provided number.
 await ahk.setMouseSpeed(speed);
 ```
 **speed** - A *number* from (0 - 100) of how fast the mouse will move by default. A speed of 0 will instantly move the mouse.
+## Examples
+A script that exits on `\`, clicks on `]`, and clicks every 5 seconds.
+```js
+async function allCode() {
+  const ahk = await require("./AHKNodeJS")(require("ahk.exe"), [
+    { key: "\\", noInterrupt: true },
+    { key: "]", noInterrupt: true },
+  ]);
+  ahk.setHotkey( { key: "\\", noInterrupt: true }, function() {
+    process.exit();
+  });
+  ahk.setHotkey( { key: "]", noInterrupt: true }, async function() {
+    await ahk.click();
+  });
+  while (true) {
+    await ahk.waitForInterrupt();
+    await ahk.click();
+    await ahk.sleep(5000);
+  }
+}
+allCode().catch(function(error) {
+  console.log(error);
+});
+```
 
 ## License
 [MIT](https://github.com/Richard-X-366/AHKNodeJS/blob/master/LICENSE/)
