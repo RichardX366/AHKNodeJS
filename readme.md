@@ -32,6 +32,7 @@ AHK NodeJS allows users to communicate with AutoHotKey using NodeJS.
     - [sendInput](#sendinput)
     - [setKeyDelay](#setkeydelay)
     - [setMouseSpeed](#setmousespeed)
+- [Examples](#examples)
 
 ## Installation
 
