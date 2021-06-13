@@ -32,7 +32,6 @@ AHK NodeJS allows users to communicate with AutoHotKey using NodeJS.
     - [sendInput](#sendinput)
     - [setKeyDelay](#setkeydelay)
     - [setMouseSpeed](#setmousespeed)
-- [Examples](#examples)
 
 ## Installation
 
@@ -132,11 +131,13 @@ var percentages = ahk.toPx([x, y]);
 ### setHotkey
 Binds a hotkey to a function
 ```js
-ahk.setHotkey(hotkey, toRun);
+ahk.setHotkey(hotkey, toRun, instant?);
 ```
 **hotkey** - The *object* or *string* hotkey used in the intitialization of AHKNodeJS
 
 **toRun** - An async or normal function that will be run when the hotkey is triggered and run in [waitForInterrupt](#waitforinterrupt)
+
+**instant** - A boolean that determines whether or not the function will be run instantly. If this is set to true, toRun should not contain any AHK communication as it could result in two AHK functions running synchronously which would likely crash the script.
 ***
 ### sleep
 Sleeps for a certain amount of time
@@ -383,7 +384,7 @@ async function allCode() {
   ]);
   ahk.setHotkey( { key: "\\", noInterrupt: true }, function() {
     process.exit();
-  });
+  }, true);
   ahk.setHotkey( { key: "]", noInterrupt: true }, async function() {
     await ahk.click();
   });

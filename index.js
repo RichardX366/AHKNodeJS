@@ -61,12 +61,20 @@ module.exports = async function(path, hotkeysList, options) {
      * Sets a hotkey to a function
      * @param {string | object} key - The hotkey to bind
      * @param {function} run - The function to run on bind
+     * @param {boolean} instant - Whether or not to instantly run the hotkey
      */
-    setHotkey(key, run) {
+    setHotkey(key, run, instant) {
       var ahkKey;
       if (typeof key === "string") ahkKey = key;
       else {
-        if (key.keys) ahkKey = key.keys.join(" ");
+        if (key.keys) ahkKey = key.keys
+        .replace(/!/g, "{!}")
+        .replace(/#/g, "{#}")
+        .replace(/\+/g, "{+}")
+        .replace(/\^/g, "{^}")
+        .replace(/\\{/g, "{{}")
+        .replace(/\\}/g, "{}}")
+        .join(" ");
         else {
           let mod = "";
           if (key.modifiers) {
@@ -78,11 +86,16 @@ module.exports = async function(path, hotkeysList, options) {
             .replace("any", "*")
           }
           ahkKey = mod + key.key
+          .replace(/!/g, "{!}")
+          .replace(/#/g, "{#}")
+          .replace(/\+/g, "{+}")
+          .replace(/\^/g, "{^}")
           .replace(/\\{/g, "{{}")
           .replace(/\\}/g, "{}}");
         }
       }
       ahk.hotkeys[ahkKey] = run;
+      if (instant) ahk.hotkeys[ahkKey].instant = true;
     },
     /**
      * Sleeps for a certain amount of time
@@ -445,7 +458,8 @@ write(x) {
   });
   hotkeys.stdout.on("data", function(data) {
     data = data.toString();
-    ahk.hotkeysPending.push(data);
+    if (ahk.hotkeys[data].instant) ahk.hotkeys[data]();
+    else ahk.hotkeysPending.push(data);
   });
   var initVars = JSON.parse(await wait());
   ahk.width = initVars.width;
