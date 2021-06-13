@@ -318,36 +318,36 @@ var position = await ahk.getMousePos(positioning?);
 **Returns** - If normal positioning is used, it returns [x, y] where x and y are the coordinates of the mouse. If percent positioning is used, it returns [x, y] where x and y are percentages of the screen.
 ***
 ### send
-Sends the provided *string*.
+Sends the provided *string* possibly wrapped in an *object*.
 ```js
 await ahk.send({
   msg: string,
   blind?: boolean
-});
+} | msg);
 ```
 **msg** - The message to send
 
 **blind** - Whether or not [blind mode](https://www.autohotkey.com/docs/commands/Send.htm#Blind) will be used
 ***
 ### sendInput
-Sends the provided *string* using [sendInput](https://www.autohotkey.com/docs/commands/Send.htm#SendInputDetail).
+Sends the provided *string* using [sendInput](https://www.autohotkey.com/docs/commands/Send.htm#SendInputDetail) possibly wrapped in an *object*.
 ```js
 await ahk.sendInput({
   msg: string,
   blind?: boolean
-});
+} | msg);
 ```
 **msg** - The message to send
 
 **blind** - Whether or not [blind mode](https://www.autohotkey.com/docs/commands/Send.htm#Blind) will be used
 ***
 ### sendPlay
-Sends the provided *string* using [sendPlay](https://www.autohotkey.com/docs/commands/Send.htm#SendPlayDetail).
+Sends the provided *string* using [sendPlay](https://www.autohotkey.com/docs/commands/Send.htm#SendPlayDetail) possibly wrapped in an *object*.
 ```js
 await ahk.sendPlay({
   msg: string,
   blind?: boolean
-});
+} | msg);
 ```
 **msg** - The message to send
 

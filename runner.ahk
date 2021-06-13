@@ -55,7 +55,7 @@ Loop {
     ImageSearch, x, y, data[2], data[3], data[4], data[5], % data[6]
     write(x " " y)
   } else if (data[1] = "setKeyDelay") {
-    setKeyDelay, data[2], data[3], % data[4]
+    SetKeyDelay, data[2], data[3], % data[4]
     write("done")
   } else if (data[1] = "send") {
     Send % data[2]

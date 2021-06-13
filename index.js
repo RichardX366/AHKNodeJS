@@ -337,10 +337,11 @@ module.exports = async function(path, hotkeysList, options) {
     },
     /**
      * Types out a string. Look at documentation for extra information.
-     * @param {{ msg: string, blind?: boolean}} x - The string to send
+     * @param {{ msg: string, blind?: boolean} | string} x - The string to send
      */
     async send(x) {
-      var toSend = "{Text}";
+      if (typeof x === "string") x = { msg: x };
+      var toSend = "";
       if (x.blind) toSend += "{Blind}";
       toSend += x.msg
       .replace(/!/g, "{!}")
@@ -348,16 +349,18 @@ module.exports = async function(path, hotkeysList, options) {
       .replace(/\+/g, "{+}")
       .replace(/\^/g, "{^}")
       .replace(/\\{/g, "{{}")
-      .replace(/\\}/g, "{}}");
+      .replace(/\\}/g, "{}}")
+      .replace(/\n/g, "{enter}");
       runner.stdin.write(`send;${toSend}\n`);
       await wait();
     },
     /**
      * Types out a string using SendInput. Look at documentation for extra information.
-     * @param {string} x - The string to send
+     * @param {{ msg: string, blind?: boolean} | string} x - The string to send
      */
     async sendInput(x) {
-      var toSend = "{Text}";
+      if (typeof x === "string") x = { msg: x };
+      var toSend = "";
       if (x.blind) toSend += "{Blind}";
       toSend += x.msg
       .replace(/!/g, "{!}")
@@ -365,16 +368,18 @@ module.exports = async function(path, hotkeysList, options) {
       .replace(/\+/g, "{+}")
       .replace(/\^/g, "{^}")
       .replace(/\\{/g, "{{}")
-      .replace(/\\}/g, "{}}");
+      .replace(/\\}/g, "{}}")
+      .replace(/\n/g, "{enter}");
       runner.stdin.write(`sendInput;${toSend}\n`);
       await wait();
     },
     /**
      * Types out a string using SendPlay. Look at documentation for extra information.
-     * @param {string} x - The string to send
+     * @param {{ msg: string, blind?: boolean} | string} x - The string to send
      */
     async sendPlay(x) {
-      var toSend = "{Text}";
+      if (typeof x === "string") x = { msg: x };
+      var toSend = "";
       if (x.blind) toSend += "{Blind}";
       toSend += x.msg
       .replace(/!/g, "{!}")
@@ -382,7 +387,8 @@ module.exports = async function(path, hotkeysList, options) {
       .replace(/\+/g, "{+}")
       .replace(/\^/g, "{^}")
       .replace(/\\{/g, "{{}")
-      .replace(/\\}/g, "{}}");
+      .replace(/\\}/g, "{}}")
+      .replace(/\n/g, "{enter}");
       runner.stdin.write(`sendPlay;${toSend}\n`);
       await wait();
     },
@@ -420,7 +426,7 @@ write(x) {
       if (x.keys) {
         ahk.hotkeys[x.keys.join(" ")] = function() {};
         hotkeysString += `${x.keys.join(" & ")}::write("${x.keys.join(" ")}")
-  `;
+`;
       } else {
         let mod = "";
         if (x.modifiers) {
@@ -436,7 +442,7 @@ write(x) {
         .replace(/\\}/g, "{}}");
         ahk.hotkeys[mod + key] = function() {};
         hotkeysString += `${mod + key}::write("${mod + key}")
-  `;
+`;
       }
     }
   });
