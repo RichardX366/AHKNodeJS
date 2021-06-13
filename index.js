@@ -31,29 +31,28 @@ module.exports = async function(path, hotkeysList, options) {
   }
   function wait() {
     return new Promise(function(resolve) {
-      ahk.current = resolve;
+      current = resolve;
     });
   }
+  var current = null;
   const ahk = {
     defaultColorVariation: 0,
-    hotkeysList: hotkeysList,
     width: 1366,
     height: 768,
-    current: null,
     hotkeys: {},
     hotkeysPending: [],
     /**
-     * Turns pixel coordinates into screen percents
+     * Turns pixel coordinates into screen percentages
      * @param {[x: number, y: number]} x - The coordinates
-     * @returns The array with pixels as screen percents.
+     * @returns The array with pixels as screen percentages.
      */
     toPercent(x) {
       return [x[0] * 100 / ahk.width, x[1] * 100 / ahk.height];
     },
     /**
-     * Turns screen percents into pixel coordinates
+     * Turns screen percentages into pixel coordinates
      * @param {[x: number, y: number]} x - The percentages
-     * @returns The array with screen percents as pixels.
+     * @returns The array with screen percentages as pixels.
      */
     toPx(x) {
       return [x[0] / 100 * ahk.width, x[1] / 100 * ahk.height];
@@ -105,21 +104,21 @@ module.exports = async function(path, hotkeysList, options) {
       }
     },
     /**
-     * Moves the mouse; If positioning is % then the coordinates are interpreted as percents of the screen
+     * Moves the mouse; If positioning is % then the coordinates are interpreted as percentages of the screen
      * @param {{
      *  x: number,
      *  y: number,
-     *  time?: number,
+     *  speed?: number,
      *  positioning?: number
      * }} x - The Parameters
      */
     async mouseMove(x) {
-      if (!x.time) x.time = "";
+      if (!x.speed) x.speed = "";
       if (x.positioning === "%") {
         x.x = Math.floor(x.x / 100 * ahk.width);
         x.y = Math.floor(x.y / 100 * ahk.height);
       }
-      runner.stdin.write(`mouseMove;${x.x};${x.y};${x.time}\n`);
+      runner.stdin.write(`mouseMove;${x.x};${x.y};${x.speed}\n`);
       await wait();
     },
     /**
@@ -157,6 +156,40 @@ module.exports = async function(path, hotkeysList, options) {
       await wait();
     },
     /**
+     * Clicks the mouse using SendPlay. Look at the documentation for information on parameters.
+     * @param {{
+     *  x?: number,
+     *  y?: number,
+     *  positioning?: string
+     *  button?: string,
+     *  state?: string,
+     *  count?: number
+     * }} x - The parameters
+     */
+    async clickPlay(x) {
+      if (!x) {
+        x = {};
+      }
+      if (!x.x || !x.y) {
+        x.x = "";
+        x.y = "";
+      }
+      if (x.positioning === "%" && x.x) {
+        x.x = Math.floor(x.x / 100 * ahk.width);
+        x.y = Math.floor(x.y / 100 * ahk.height);
+      }
+      if (x.button === "left") x.button = "L";
+      else if (x.button === "middle") x.button = "M";
+      else if (x.button === "right") x.button = "R";
+      else x.button = "";
+      if (x.state === "down") x.state = "D";
+      else if (x.state === "up") x.state = "U";
+      else x.state = "";
+      if (!x.count) x.count = "";
+      runner.stdin.write(`clickPlay;${x.x} ${x.y} ${x.button} ${x.state} ${x.count}\n`);
+      await wait();
+    },
+    /**
      * Gets or sets the clipboard
      * @param {string} [x] - If provided, the clipboard is set to the value
      * @returns The clipboard if no parameters are passed in
@@ -178,9 +211,10 @@ module.exports = async function(path, hotkeysList, options) {
      *  x2: number,
      *  y2: number,
      *  color: string,
-     *  variation?: number
+     *  variation?: number,
+     *  positioning?: string
      * }} x - The parameters
-     * @returns If found, [x, y]. If % positioning is used, it returns them as screen percents.
+     * @returns If found, [x, y]. If % positioning is used, it returns them as screen percentages.
      */
     async pixelSearch(x) {
       if (!x.variation) x.variation = ahk.defaultColorVariation;
@@ -217,19 +251,15 @@ module.exports = async function(path, hotkeysList, options) {
         x.y = Math.floor(x.y / 100 * ahk.height);
       }
       var mode = "RGB ";
-      if (x.mode === "slow") {
-        mode += "Slow";
-      } else if (x.mode === "alt") {
-        mode += "Alt";
-      }
+      if (x.mode === "slow") mode += "Slow";
+      else if (x.mode === "alt") mode += "Alt";
       runner.stdin.write(`getPixelColor;${x.x};${x.y};${mode}\n`);
-      var color = (await wait()).replace("0x", "").split("");
-      return color[4]+color[5]+color[2]+color[3]+color[0]+color[1];
+      return (await wait()).replace("0x", "");
     },
     /**
      * Gets the location of the mouse.
      * @param {string} [x] 
-     * @returns [x, y] If % positioning is used, they are returned as screen percents.
+     * @returns [x, y] If % positioning is used, they are returned as screen percentages.
      */
     async getMousePos(x) {
       runner.stdin.write(`getMousePos\n`);
@@ -247,11 +277,12 @@ module.exports = async function(path, hotkeysList, options) {
      *  y1: number,
      *  x2: number,
      *  y2: number,
-     *  variation?: number
-     *  trans?: string
+     *  imgPath: string,
+     *  variation?: number,
+     *  trans?: string,
      *  positioning?: string
      * }} x - The parameters
-     * @returns If found, [x, y]. If % positioning is used, it returns them as screen percents.
+     * @returns If found, [x, y]. If % positioning is used, it returns them as screen percentages.
      */
     async imageSearch(x) {
       if (!x.variation) x.variation = ahk.defaultColorVariation;
@@ -280,7 +311,7 @@ module.exports = async function(path, hotkeysList, options) {
      * @param {{
      *  delay?: number,
      *  duration?: number,
-     *  play?: number
+     *  play?: boolean
      * }} x - The parameters
      */
     async setKeyDelay(x) {
@@ -293,7 +324,7 @@ module.exports = async function(path, hotkeysList, options) {
     },
     /**
      * Types out a string. Look at documentation for extra information.
-     * @param {string} x - The string to send
+     * @param {{ msg: string, blind?: boolean}} x - The string to send
      */
     async send(x) {
       var toSend = "{Text}";
@@ -407,9 +438,9 @@ write(x) {
   });
   runner.stdout.on("data", function(data) {
     data = data.toString();
-    if (ahk.current) {
-      ahk.current(data);
-      ahk.current = null;
+    if (current) {
+      current(data);
+      current = null;
     }
   });
   hotkeys.stdout.on("data", function(data) {

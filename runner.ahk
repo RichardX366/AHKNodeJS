@@ -35,7 +35,7 @@ Loop {
     Click % data[2]
     write("done")
   } else if (data[1] = "clickPlay") {
-    SendPlay % "{Click" data[2] "}"
+    SendPlay % "{{}Click " data[2] "{}}"
     write("done")
   } else if (data[1] = "getClipboard") {
     write(clipboard)
@@ -46,7 +46,7 @@ Loop {
     PixelSearch, x, y, data[2], data[3], data[4], data[5], data[6], data[7], Fast RGB
     write(x " " y)
   } else if (data[1] = "getPixelColor") {
-    PixelGetColor, color, data[2], data[3], data[4]
+    PixelGetColor, color, data[2], data[3], % data[4]
     write(color)
   } else if (data[1] = "getMousePos") {
     MouseGetPos, x, y
