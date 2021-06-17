@@ -32,6 +32,7 @@ AHK NodeJS allows users to communicate with AutoHotKey using NodeJS.
     - [sendInput](#sendinput)
     - [setKeyDelay](#setkeydelay)
     - [setMouseSpeed](#setmousespeed)
+    - [shutdown](#shutdown)
 
 ## Installation
 
@@ -374,6 +375,12 @@ Sets the default mouse speed to the provided number.
 await ahk.setMouseSpeed(speed);
 ```
 **speed** - A *number* from (0 - 100) of how fast the mouse will move by default. A speed of 0 will instantly move the mouse.
+***
+### shutdown
+Shuts down the entire computer. Because it shuts down the computer, this will return nothing nor wait for AHK to return anything.
+```js
+ahk.shutdown();
+```
 ## Examples
 A script that exits on `\`, clicks on `]`, and clicks every 5 seconds.
 ```js

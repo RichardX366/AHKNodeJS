@@ -3,11 +3,9 @@
 #UseHook
 CoordMode, Pixel, Screen
 CoordMode, Mouse, Screen
-SetBatchLines -1
-
+SetBatchLines, -1
 stdin := FileOpen("*", "r `n")
 stdout := FileOpen("*", "w `n")
-
 write(x) {
   global stdout
   stdout.Write(x)
@@ -69,5 +67,7 @@ Loop {
   } else if (data[1] = "setMouseSpeed") {
     SetDefaultMouseSpeed % data[2]
     write("done")
+  } else if (data[1] = "shutdown") {
+    Shutdown, 8
   }
 }

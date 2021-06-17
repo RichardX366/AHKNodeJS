@@ -399,6 +399,12 @@ module.exports = async function(path, hotkeysList, options) {
     async setMouseSpeed(x) {
       runner.stdin.write(`setMouseSpeed;${x}\n`);
       await wait();
+    },
+    /**
+     * Shuts down the computer
+     */
+    shutdown() {
+      runner.stdin.write("shutdown\n");
     }
   };
   if (options.defaultColorVariation) {
