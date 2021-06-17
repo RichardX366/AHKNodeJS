@@ -36,7 +36,7 @@ module.exports = async function(path, hotkeysList, options) {
   }
   var current = null;
   const ahk = {
-    defaultColorVariation: 0,
+    defaultColorVariation: 1,
     width: 1366,
     height: 768,
     hotkeys: {},

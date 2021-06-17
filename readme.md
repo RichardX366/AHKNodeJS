@@ -90,7 +90,7 @@ Modifiers that can be used are win, alt, control, shift, and any (any modifier w
 Note: If a multi-key hotkey is used, it will trigger no matter what modifers are present in accordance with [AutoHotKey](https://www.autohotkey.com/docs/Hotkeys.htm#combo)
 #### Options:
  An object with the options to set for AHKNodeJS. The properties are listed below:
-- **defaultColorVariation** -  If the color variation is not set for [imageSearch](#imagesearch) and [pixelSearch](#pixelsearch), this *number* is automatically used. (Defaults to 0)
+- **defaultColorVariation** -  If the color variation is not set for [imageSearch](#imagesearch) and [pixelSearch](#pixelsearch), this *number* is automatically used. (Defaults to 1)
 
 **Returns** - The AHK object
 
@@ -252,7 +252,7 @@ var found = await ahk.imageSearch({
 
 **imgPath** - A *string* representing the path to the image to be searched. This path is either relative to the current working directory or an absolute file path.
 
-**variation** - A *number* showing the amount of shades a pixel's red, green, and blue values can be off by ranging from (0 - 255). 
+**variation** - A *number* showing the amount of shades a pixel's red, green, and blue values can be off by ranging from (0 - 255). Defaults to the option, defaultColorVariation.
 
 **trans** - An RGB hex *string* representing the color that should be treated as transparent and match any color.
 
@@ -283,7 +283,7 @@ var found = await ahk.pixelSearch({
 
 **color** - An RGB hex *string* representing the color that should be searched for in.
 
-**variation** - A *number* showing the amount of shades a pixel's red, green, and blue values can be off by ranging from (0 - 255). 
+**variation** - A *number* showing the amount of shades a pixel's red, green, and blue values can be off by ranging from (0 - 255). Defaults to the option, defaultColorVariation.
 
 **positioning** - If positioning is set to %, then x1, y1, x2, and y2 will be interpreted as percentages of the screen's width and height rather than coordinates
 
