@@ -298,7 +298,7 @@ module.exports = async function(path, hotkeysList, options) {
      * @returns If found, [x, y]. If % positioning is used, it returns them as screen percentages.
      */
     async imageSearch(x) {
-      if (!x.variation) x.variation = ahk.defaultColorVariation;
+      if (!x.variation) x.variation = `*${ahk.defaultColorVariation} `;
       else x.variation = `*${x.variation} `;
       if (!x.trans) x.trans = "";
       else x.trans = `*Trans0x${x.trans} `;
