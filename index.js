@@ -37,8 +37,8 @@ module.exports = async function(path, hotkeysList, options) {
   var current = null;
   const ahk = {
     defaultColorVariation: 1,
-    width: 1366,
-    height: 768,
+    width: 1365,
+    height: 767,
     hotkeys: {},
     hotkeysPending: [],
     /**
@@ -474,7 +474,7 @@ write(x) {
     else ahk.hotkeysPending.push(data);
   });
   var initVars = JSON.parse(await wait());
-  ahk.width = initVars.width;
-  ahk.height = initVars.height;
+  ahk.width = initVars.width - 1;
+  ahk.height = initVars.height - 1;
   return ahk;
 };
