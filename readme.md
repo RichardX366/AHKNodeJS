@@ -102,8 +102,8 @@ The AHK object holds all the functions that are used to communicate with AutoHot
 
 ### Properties
 - **Options** - The AHK object contains the [options](#options) that were used to initiate it as different properties of the AHK object. If an option was not set, the property in the AHK object will be the default value. If this value is changed, it will be as if AHKNodeJS had initialized with that option changed.
-- **width** - The current width of the screen in pixels (Do not change)
-- **height** - The current height of the screen in pixels (Do not change)
+- **width** - The x-coordinate of the rightmost pixels of the screen (Do not change)
+- **height** - The y-coordinate of the downmost pixels of the screen (Do not change)
 - **hotkeys** - An *object* containing each hotkey and the function that it runs once pressed. (Do not change)
 - **hotkeysPending** - An array containing the hotkeys that are pending to be run in a [waitForInterrupt](#waitforinterrupt)
 ***
