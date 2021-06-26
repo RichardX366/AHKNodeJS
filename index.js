@@ -277,6 +277,8 @@ module.exports = async function (path, hotkeysList, options) {
     async getMousePos(x) {
       runner.stdin.write(`getMousePos\n`);
       var pos = (await wait()).split(" ");
+      pos[0] = Number(pos[0]);
+      pos[1] = Number(pos[1]);
       if (x === "%") {
         pos[0] = pos[0] / ahk.width * 100;
         pos[1] = pos[1] / ahk.height * 100;
