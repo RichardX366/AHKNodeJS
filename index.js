@@ -22,7 +22,7 @@ const fs = require("fs/promises");
  * }} options - The options to initiate AHK NodeJS with
  * @returns An object containing this package's functions
  */
-module.exports = async function(path, hotkeysList, options) {
+module.exports = async function (path, hotkeysList, options) {
   if (!hotkeysList) {
     hotkeysList = [];
   }
@@ -30,15 +30,15 @@ module.exports = async function(path, hotkeysList, options) {
     options = {};
   }
   function wait() {
-    return new Promise(function(resolve) {
+    return new Promise(function (resolve) {
       current = resolve;
     });
   }
   var current = null;
   const ahk = {
     defaultColorVariation: 1,
-    width: 1365,
-    height: 767,
+    width: 1366,
+    height: 768,
     hotkeys: {},
     hotkeysPending: [],
     /**
@@ -68,30 +68,30 @@ module.exports = async function(path, hotkeysList, options) {
       if (typeof key === "string") ahkKey = key;
       else {
         if (key.keys) ahkKey = key.keys
-        .replace(/!/g, "{!}")
-        .replace(/#/g, "{#}")
-        .replace(/\+/g, "{+}")
-        .replace(/\^/g, "{^}")
-        .replace(/\\{/g, "{{}")
-        .replace(/\\}/g, "{}}")
-        .join(" ");
-        else {
-          let mod = "";
-          if (key.modifiers) {
-            mod += key.modifiers.join("")
-            .replace("win", "#")
-            .replace("alt", "!")
-            .replace("control", "^")
-            .replace("shift", "+")
-            .replace("any", "*")
-          }
-          ahkKey = mod + key.key
           .replace(/!/g, "{!}")
           .replace(/#/g, "{#}")
           .replace(/\+/g, "{+}")
           .replace(/\^/g, "{^}")
           .replace(/\\{/g, "{{}")
-          .replace(/\\}/g, "{}}");
+          .replace(/\\}/g, "{}}")
+          .join(" ");
+        else {
+          let mod = "";
+          if (key.modifiers) {
+            mod += key.modifiers.join("")
+              .replace("win", "#")
+              .replace("alt", "!")
+              .replace("control", "^")
+              .replace("shift", "+")
+              .replace("any", "*")
+          }
+          ahkKey = mod + key.key
+            .replace(/!/g, "{!}")
+            .replace(/#/g, "{#}")
+            .replace(/\+/g, "{+}")
+            .replace(/\^/g, "{^}")
+            .replace(/\\{/g, "{{}")
+            .replace(/\\}/g, "{}}");
         }
       }
       ahk.hotkeys[ahkKey] = run;
@@ -103,7 +103,7 @@ module.exports = async function(path, hotkeysList, options) {
      * @returns A promise that is fufilled once the time is up
      */
     sleep(x) {
-      return new Promise(function(resolve) {
+      return new Promise(function (resolve) {
         setTimeout(resolve, x);
       });
     },
@@ -112,7 +112,7 @@ module.exports = async function(path, hotkeysList, options) {
      */
     async waitForInterrupt() {
       while (ahk.hotkeysPending[0]) {
-        await ahk.hotkeys[ahk.hotkeysPending[0]]();
+        await ahk.hotkeysPending[0]();
         ahk.hotkeysPending.shift();
       }
     },
@@ -344,13 +344,13 @@ module.exports = async function(path, hotkeysList, options) {
       var toSend = "";
       if (x.blind) toSend += "{Blind}";
       toSend += x.msg
-      .replace(/!/g, "{!}")
-      .replace(/#/g, "{#}")
-      .replace(/\+/g, "{+}")
-      .replace(/\^/g, "{^}")
-      .replace(/\\{/g, "{{}")
-      .replace(/\\}/g, "{}}")
-      .replace(/\n/g, "{enter}");
+        .replace(/!/g, "{!}")
+        .replace(/#/g, "{#}")
+        .replace(/\+/g, "{+}")
+        .replace(/\^/g, "{^}")
+        .replace(/\\{/g, "{{}")
+        .replace(/\\}/g, "{}}")
+        .replace(/\n/g, "{enter}");
       runner.stdin.write(`send;${toSend}\n`);
       await wait();
     },
@@ -363,13 +363,13 @@ module.exports = async function(path, hotkeysList, options) {
       var toSend = "";
       if (x.blind) toSend += "{Blind}";
       toSend += x.msg
-      .replace(/!/g, "{!}")
-      .replace(/#/g, "{#}")
-      .replace(/\+/g, "{+}")
-      .replace(/\^/g, "{^}")
-      .replace(/\\{/g, "{{}")
-      .replace(/\\}/g, "{}}")
-      .replace(/\n/g, "{enter}");
+        .replace(/!/g, "{!}")
+        .replace(/#/g, "{#}")
+        .replace(/\+/g, "{+}")
+        .replace(/\^/g, "{^}")
+        .replace(/\\{/g, "{{}")
+        .replace(/\\}/g, "{}}")
+        .replace(/\n/g, "{enter}");
       runner.stdin.write(`sendInput;${toSend}\n`);
       await wait();
     },
@@ -382,13 +382,13 @@ module.exports = async function(path, hotkeysList, options) {
       var toSend = "";
       if (x.blind) toSend += "{Blind}";
       toSend += x.msg
-      .replace(/!/g, "{!}")
-      .replace(/#/g, "{#}")
-      .replace(/\+/g, "{+}")
-      .replace(/\^/g, "{^}")
-      .replace(/\\{/g, "{{}")
-      .replace(/\\}/g, "{}}")
-      .replace(/\n/g, "{enter}");
+        .replace(/!/g, "{!}")
+        .replace(/#/g, "{#}")
+        .replace(/\+/g, "{+}")
+        .replace(/\^/g, "{^}")
+        .replace(/\\{/g, "{{}")
+        .replace(/\\}/g, "{}}")
+        .replace(/\n/g, "{enter}");
       runner.stdin.write(`sendPlay;${toSend}\n`);
       await wait();
     },
@@ -421,7 +421,7 @@ write(x) {
   stdout.Read(0)
 }
 `;
-  hotkeysList.forEach(function(x) {
+  hotkeysList.forEach(function (x) {
     if (x.noInterrupt) {
       hotkeysString += "~";
     }
@@ -430,23 +430,23 @@ write(x) {
 `;
     } else {
       if (x.keys) {
-        ahk.hotkeys[x.keys.join(" ")] = function() {};
+        ahk.hotkeys[x.keys.join(" ")] = function () { };
         hotkeysString += `${x.keys.join(" & ")}::write("${x.keys.join(" ")}")
 `;
       } else {
         let mod = "";
         if (x.modifiers) {
           mod += x.modifiers.join("")
-          .replace("win", "#")
-          .replace("alt", "!")
-          .replace("control", "^")
-          .replace("shift", "+")
-          .replace("any", "*")
+            .replace("win", "#")
+            .replace("alt", "!")
+            .replace("control", "^")
+            .replace("shift", "+")
+            .replace("any", "*")
         }
         var key = x.key
-        .replace(/\\{/g, "{{}")
-        .replace(/\\}/g, "{}}");
-        ahk.hotkeys[mod + key] = function() {};
+          .replace(/\\{/g, "{{}")
+          .replace(/\\}/g, "{}}");
+        ahk.hotkeys[mod + key] = function () { };
         hotkeysString += `${mod + key}::write("${mod + key}")
 `;
       }
@@ -457,24 +457,24 @@ write(x) {
   runner.stdout.on("end", process.exit);
   hotkeys.stdout.on("end", process.exit);
   process.on("SIGINT", process.exit);
-  process.on("exit", function() {
+  process.on("exit", function () {
     if (!runner.killed) runner.kill();
     if (!hotkeys.killed) hotkeys.kill();
   });
-  runner.stdout.on("data", function(data) {
+  runner.stdout.on("data", function (data) {
     data = data.toString();
     if (current) {
       current(data);
       current = null;
     }
   });
-  hotkeys.stdout.on("data", function(data) {
+  hotkeys.stdout.on("data", function (data) {
     data = data.toString();
     if (ahk.hotkeys[data].instant) ahk.hotkeys[data]();
-    else ahk.hotkeysPending.push(data);
+    else ahk.hotkeysPending.push(ahk.hotkeys[data]);
   });
   var initVars = JSON.parse(await wait());
-  ahk.width = initVars.width - 1;
-  ahk.height = initVars.height - 1;
+  ahk.width = initVars.width;
+  ahk.height = initVars.height;
   return ahk;
 };
