@@ -37,7 +37,7 @@ AHK NodeJS allows users to communicate with AutoHotKey using NodeJS.
 ## Installation
 
 Use [npm](https://www.npmjs.com) to install AHK NodeJS.
-If AutoHotKey.exe is not installed on your computer, please install it or refer to another npm module, [ahk.exe](https://www.npmjs.com/package/ahk.exe).
+If AutoHotKey.exe is not installed on your computer, please install it or refer to another npm module, [ahk.exe](https://www.npmjs.com/package/ahk.exe), [AHK Releases](https://github.com/AutoHotkey/AutoHotkey/releases).
 
 ```bash
 npm i ahknodejs
@@ -57,7 +57,9 @@ npm i ahknodejs
 const ahk = await require("ahknodejs")(Path, Hotkeys?, Options?);
 ```
 
-**Path** - A *string* representing the location of AutoHotKey.exe
+**Path** - A *string* representing the location of AutoHotKey.exe 
+- v1: `const ahk = await require("./AHKNodeJS")(require("ahk.exe")`
+- v2: `const ahk = await require("ahknodejs")("ahk.exe")`
 
 **Hotkeys** - A list of either *strings* and/or *objects* representing the hotkeys that will be used. The hotkeys will need to be [set](#sethotkey) in order to be used.
 
@@ -383,6 +385,8 @@ ahk.shutdown();
 ```
 ## Examples
 A script that exits on `\`, clicks on `]`, and clicks every 5 seconds.
+
+- v1:
 ```js
 async function allCode() {
   const ahk = await require("./AHKNodeJS")(require("ahk.exe"), [
@@ -404,6 +408,36 @@ async function allCode() {
 allCode().catch(function(error) {
   console.log(error);
 });
+```
+
+- v2:
+```js
+const ahkexepath = "C:/Program Files/AutoHotkey/v2/AutoHotkey.exe";
+
+async function allCode() {
+    const ahk = await require("ahknodejs")(ahkexepath, [
+        { key: "\\", noInterrupt: true },
+        { key: "]", noInterrupt: true },
+    ]);
+
+    ahk.setHotkey({ key: "\\", noInterrupt: true }, function () {
+        process.exit();
+    }, true);
+
+    ahk.setHotkey({ key: "]", noInterrupt: true }, async function () {
+        await ahk.click();
+    });
+
+    while (true) {
+        await ahk.waitForInterrupt();
+        await ahk.click();
+        await ahk.sleep(5000);
+    }
+}
+
+
+try { allCode(); }
+catch (e) { console.log(e); }
 ```
 
 ## License
