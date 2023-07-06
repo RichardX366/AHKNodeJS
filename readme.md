@@ -1,7 +1,7 @@
 
 # AHK NodeJS
 
-AHK NodeJS allows users to communicate with AutoHotKey using NodeJS.
+AHK NodeJS allows users to communicate with AutoHotKey using NodeJS. Updated for AutoHotkey v2.0.3
 
 ## Contents
 
