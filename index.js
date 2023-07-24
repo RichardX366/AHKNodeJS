@@ -1,5 +1,5 @@
-const spawn = require("child_process").spawn;
-const fs = require("fs/promises");
+const spawn = require('child_process').spawn;
+const fs = require('fs/promises');
 
 /**
  * Initiates AHK NodeJS with the following parameters
@@ -19,6 +19,7 @@ const fs = require("fs/promises");
  * ]?} hotkeysList - A list of to-be-used hotkeys
  * @param {{
  *  defaultColorVariation?: number
+ *  ahkV1?: boolean
  * }} options - The options to initiate AHK NodeJS with
  * @returns An object containing this package's functions
  */
@@ -47,7 +48,7 @@ module.exports = async function (path, hotkeysList, options) {
      * @returns The array with pixels as screen percentages.
      */
     toPercent(x) {
-      return [x[0] * 100 / ahk.width, x[1] * 100 / ahk.height];
+      return [(x[0] * 100) / ahk.width, (x[1] * 100) / ahk.height];
     },
     /**
      * Turns screen percentages into pixel coordinates
@@ -55,7 +56,7 @@ module.exports = async function (path, hotkeysList, options) {
      * @returns The array with screen percentages as pixels.
      */
     toPx(x) {
-      return [x[0] / 100 * ahk.width, x[1] / 100 * ahk.height];
+      return [(x[0] / 100) * ahk.width, (x[1] / 100) * ahk.height];
     },
     /**
      * Sets a hotkey to a function
@@ -65,33 +66,37 @@ module.exports = async function (path, hotkeysList, options) {
      */
     setHotkey(key, run, instant) {
       var ahkKey;
-      if (typeof key === "string") ahkKey = key;
+      if (typeof key === 'string') ahkKey = key;
       else {
-        if (key.keys) ahkKey = key.keys
-          .replace(/!/g, "{!}")
-          .replace(/#/g, "{#}")
-          .replace(/\+/g, "{+}")
-          .replace(/\^/g, "{^}")
-          .replace(/\\{/g, "{{}")
-          .replace(/\\}/g, "{}}")
-          .join(" ");
+        if (key.keys)
+          ahkKey = key.keys
+            .replace(/!/g, '{!}')
+            .replace(/#/g, '{#}')
+            .replace(/\+/g, '{+}')
+            .replace(/\^/g, '{^}')
+            .replace(/\\{/g, '{{}')
+            .replace(/\\}/g, '{}}')
+            .join(' ');
         else {
-          let mod = "";
+          let mod = '';
           if (key.modifiers) {
-            mod += key.modifiers.join("")
-              .replace("win", "#")
-              .replace("alt", "!")
-              .replace("control", "^")
-              .replace("shift", "+")
-              .replace("any", "*")
+            mod += key.modifiers
+              .join('')
+              .replace('win', '#')
+              .replace('alt', '!')
+              .replace('control', '^')
+              .replace('shift', '+')
+              .replace('any', '*');
           }
-          ahkKey = mod + key.key
-            .replace(/!/g, "{!}")
-            .replace(/#/g, "{#}")
-            .replace(/\+/g, "{+}")
-            .replace(/\^/g, "{^}")
-            .replace(/\\{/g, "{{}")
-            .replace(/\\}/g, "{}}");
+          ahkKey =
+            mod +
+            key.key
+              .replace(/!/g, '{!}')
+              .replace(/#/g, '{#}')
+              .replace(/\+/g, '{+}')
+              .replace(/\^/g, '{^}')
+              .replace(/\\{/g, '{{}')
+              .replace(/\\}/g, '{}}');
         }
       }
       ahk.hotkeys[ahkKey] = run;
@@ -126,10 +131,10 @@ module.exports = async function (path, hotkeysList, options) {
      * }} x - The Parameters
      */
     async mouseMove(x) {
-      if (!x.speed) x.speed = "";
-      if (x.positioning === "%") {
-        x.x = Math.floor(x.x / 100 * ahk.width);
-        x.y = Math.floor(x.y / 100 * ahk.height);
+      if (!x.speed) x.speed = '';
+      if (x.positioning === '%') {
+        x.x = Math.floor((x.x / 100) * ahk.width);
+        x.y = Math.floor((x.y / 100) * ahk.height);
       }
       runner.stdin.write(`mouseMove;${x.x};${x.y};${x.speed}\n`);
       await wait();
@@ -150,22 +155,24 @@ module.exports = async function (path, hotkeysList, options) {
         x = {};
       }
       if (!x.x || !x.y) {
-        x.x = "";
-        x.y = "";
+        x.x = '';
+        x.y = '';
       }
-      if (x.positioning === "%" && x.x) {
-        x.x = Math.floor(x.x / 100 * ahk.width);
-        x.y = Math.floor(x.y / 100 * ahk.height);
+      if (x.positioning === '%' && x.x) {
+        x.x = Math.floor((x.x / 100) * ahk.width);
+        x.y = Math.floor((x.y / 100) * ahk.height);
       }
-      if (x.button === "left") x.button = "L";
-      else if (x.button === "middle") x.button = "M";
-      else if (x.button === "right") x.button = "R";
-      else x.button = "";
-      if (x.state === "down") x.state = "D";
-      else if (x.state === "up") x.state = "U";
-      else x.state = "";
-      if (!x.count) x.count = "";
-      runner.stdin.write(`click;${x.x} ${x.y} ${x.button} ${x.state} ${x.count}\n`);
+      if (x.button === 'left') x.button = 'L';
+      else if (x.button === 'middle') x.button = 'M';
+      else if (x.button === 'right') x.button = 'R';
+      else x.button = '';
+      if (x.state === 'down') x.state = 'D';
+      else if (x.state === 'up') x.state = 'U';
+      else x.state = '';
+      if (!x.count) x.count = '';
+      runner.stdin.write(
+        `click;${x.x} ${x.y} ${x.button} ${x.state} ${x.count}\n`,
+      );
       await wait();
     },
     /**
@@ -184,22 +191,24 @@ module.exports = async function (path, hotkeysList, options) {
         x = {};
       }
       if (!x.x || !x.y) {
-        x.x = "";
-        x.y = "";
+        x.x = '';
+        x.y = '';
       }
-      if (x.positioning === "%" && x.x) {
-        x.x = Math.floor(x.x / 100 * ahk.width);
-        x.y = Math.floor(x.y / 100 * ahk.height);
+      if (x.positioning === '%' && x.x) {
+        x.x = Math.floor((x.x / 100) * ahk.width);
+        x.y = Math.floor((x.y / 100) * ahk.height);
       }
-      if (x.button === "left") x.button = "L";
-      else if (x.button === "middle") x.button = "M";
-      else if (x.button === "right") x.button = "R";
-      else x.button = "";
-      if (x.state === "down") x.state = "D";
-      else if (x.state === "up") x.state = "U";
-      else x.state = "";
-      if (!x.count) x.count = "";
-      runner.stdin.write(`clickPlay;${x.x} ${x.y} ${x.button} ${x.state} ${x.count}\n`);
+      if (x.button === 'left') x.button = 'L';
+      else if (x.button === 'middle') x.button = 'M';
+      else if (x.button === 'right') x.button = 'R';
+      else x.button = '';
+      if (x.state === 'down') x.state = 'D';
+      else if (x.state === 'up') x.state = 'U';
+      else x.state = '';
+      if (!x.count) x.count = '';
+      runner.stdin.write(
+        `clickPlay;${x.x} ${x.y} ${x.button} ${x.state} ${x.count}\n`,
+      );
       await wait();
     },
     /**
@@ -231,20 +240,22 @@ module.exports = async function (path, hotkeysList, options) {
      */
     async pixelSearch(x) {
       if (!x.variation) x.variation = ahk.defaultColorVariation;
-      if (x.positioning === "%") {
-        x.x1 = Math.floor(x.x1 / 100 * ahk.width);
-        x.y1 = Math.floor(x.y1 / 100 * ahk.height);
-        x.x2 = Math.floor(x.x2 / 100 * ahk.width);
-        x.y2 = Math.floor(x.y2 / 100 * ahk.height);
+      if (x.positioning === '%') {
+        x.x1 = Math.floor((x.x1 / 100) * ahk.width);
+        x.y1 = Math.floor((x.y1 / 100) * ahk.height);
+        x.x2 = Math.floor((x.x2 / 100) * ahk.width);
+        x.y2 = Math.floor((x.y2 / 100) * ahk.height);
       }
-      runner.stdin.write(`pixelSearch;${x.x1};${x.y1};${x.x2};${x.y2};0x${x.color};${x.variation}\n`);
-      var pos = (await wait()).split(" ");
-      if (pos[0] === "") {
+      runner.stdin.write(
+        `pixelSearch;${x.x1};${x.y1};${x.x2};${x.y2};0x${x.color};${x.variation}\n`,
+      );
+      var pos = (await wait()).split(' ');
+      if (pos[0] === '') {
         return null;
       }
-      if (x.positioning === "%") {
-        pos[0] = pos[0] / ahk.width * 100;
-        pos[1] = pos[1] / ahk.height * 100;
+      if (x.positioning === '%') {
+        pos[0] = (pos[0] / ahk.width) * 100;
+        pos[1] = (pos[1] / ahk.height) * 100;
       }
       return pos;
     },
@@ -259,29 +270,29 @@ module.exports = async function (path, hotkeysList, options) {
      * @returns The pixel's color in hex RGB
      */
     async getPixelColor(x) {
-      if (x.positioning === "%") {
-        x.x = Math.floor(x.x / 100 * ahk.width);
-        x.y = Math.floor(x.y / 100 * ahk.height);
+      if (x.positioning === '%') {
+        x.x = Math.floor((x.x / 100) * ahk.width);
+        x.y = Math.floor((x.y / 100) * ahk.height);
       }
-      var mode = "RGB ";
-      if (x.mode === "slow") mode += "Slow";
-      else if (x.mode === "alt") mode += "Alt";
+      var mode = 'RGB ';
+      if (x.mode === 'slow') mode += 'Slow';
+      else if (x.mode === 'alt') mode += 'Alt';
       runner.stdin.write(`getPixelColor;${x.x};${x.y};${mode}\n`);
-      return (await wait()).replace("0x", "");
+      return (await wait()).replace('0x', '');
     },
     /**
      * Gets the location of the mouse.
-     * @param {string} [x] 
+     * @param {string} [x]
      * @returns [x, y] If % positioning is used, they are returned as screen percentages.
      */
     async getMousePos(x) {
       runner.stdin.write(`getMousePos\n`);
-      var pos = (await wait()).split(" ");
+      var pos = (await wait()).split(' ');
       pos[0] = Number(pos[0]);
       pos[1] = Number(pos[1]);
-      if (x === "%") {
-        pos[0] = pos[0] / ahk.width * 100;
-        pos[1] = pos[1] / ahk.height * 100;
+      if (x === '%') {
+        pos[0] = (pos[0] / ahk.width) * 100;
+        pos[1] = (pos[1] / ahk.height) * 100;
       }
       return pos;
     },
@@ -302,22 +313,24 @@ module.exports = async function (path, hotkeysList, options) {
     async imageSearch(x) {
       if (!x.variation) x.variation = `*${ahk.defaultColorVariation} `;
       else x.variation = `*${x.variation} `;
-      if (!x.trans) x.trans = "";
+      if (!x.trans) x.trans = '';
       else x.trans = `*Trans0x${x.trans} `;
-      if (x.positioning === "%") {
-        x.x1 = Math.floor(x.x1 / 100 * ahk.width);
-        x.y1 = Math.floor(x.y1 / 100 * ahk.height);
-        x.x2 = Math.floor(x.x2 / 100 * ahk.width);
-        x.y2 = Math.floor(x.y2 / 100 * ahk.height);
+      if (x.positioning === '%') {
+        x.x1 = Math.floor((x.x1 / 100) * ahk.width);
+        x.y1 = Math.floor((x.y1 / 100) * ahk.height);
+        x.x2 = Math.floor((x.x2 / 100) * ahk.width);
+        x.y2 = Math.floor((x.y2 / 100) * ahk.height);
       }
-      runner.stdin.write(`imageSearch;${x.x1};${x.y1};${x.x2};${x.y2};${x.variation}${x.trans}${x.imgPath}\n`);
-      var pos = (await wait()).split(" ");
-      if (pos[0] === "") {
+      runner.stdin.write(
+        `imageSearch;${x.x1};${x.y1};${x.x2};${x.y2};${x.variation}${x.trans}${x.imgPath}\n`,
+      );
+      var pos = (await wait()).split(' ');
+      if (pos[0] === '') {
         return null;
       }
-      if (x.positioning === "%") {
-        pos[0] = pos[0] / ahk.width * 100;
-        pos[1] = pos[1] / ahk.height * 100;
+      if (x.positioning === '%') {
+        pos[0] = (pos[0] / ahk.width) * 100;
+        pos[1] = (pos[1] / ahk.height) * 100;
       }
       return pos;
     },
@@ -330,10 +343,10 @@ module.exports = async function (path, hotkeysList, options) {
      * }} x - The parameters
      */
     async setKeyDelay(x) {
-      if (!x.delay) x.delay = "";
-      if (!x.duration) x.duration = "";
-      if (x.play) x.play = "Play";
-      else x.play = "";
+      if (!x.delay) x.delay = '';
+      if (!x.duration) x.duration = '';
+      if (x.play) x.play = 'Play';
+      else x.play = '';
       runner.stdin.write(`setKeyDelay;${x.delay};${x.duration};${x.play}\n`);
       await wait();
     },
@@ -342,17 +355,17 @@ module.exports = async function (path, hotkeysList, options) {
      * @param {{ msg: string, blind?: boolean} | string} x - The string to send
      */
     async send(x) {
-      if (typeof x === "string") x = { msg: x };
-      var toSend = "";
-      if (x.blind) toSend += "{Blind}";
+      if (typeof x === 'string') x = { msg: x };
+      var toSend = '';
+      if (x.blind) toSend += '{Blind}';
       toSend += x.msg
-        .replace(/!/g, "{!}")
-        .replace(/#/g, "{#}")
-        .replace(/\+/g, "{+}")
-        .replace(/\^/g, "{^}")
-        .replace(/\\{/g, "{{}")
-        .replace(/\\}/g, "{}}")
-        .replace(/\n/g, "{enter}");
+        .replace(/!/g, '{!}')
+        .replace(/#/g, '{#}')
+        .replace(/\+/g, '{+}')
+        .replace(/\^/g, '{^}')
+        .replace(/\\{/g, '{{}')
+        .replace(/\\}/g, '{}}')
+        .replace(/\n/g, '{enter}');
       runner.stdin.write(`send;${toSend}\n`);
       await wait();
     },
@@ -361,17 +374,17 @@ module.exports = async function (path, hotkeysList, options) {
      * @param {{ msg: string, blind?: boolean} | string} x - The string to send
      */
     async sendInput(x) {
-      if (typeof x === "string") x = { msg: x };
-      var toSend = "";
-      if (x.blind) toSend += "{Blind}";
+      if (typeof x === 'string') x = { msg: x };
+      var toSend = '';
+      if (x.blind) toSend += '{Blind}';
       toSend += x.msg
-        .replace(/!/g, "{!}")
-        .replace(/#/g, "{#}")
-        .replace(/\+/g, "{+}")
-        .replace(/\^/g, "{^}")
-        .replace(/\\{/g, "{{}")
-        .replace(/\\}/g, "{}}")
-        .replace(/\n/g, "{enter}");
+        .replace(/!/g, '{!}')
+        .replace(/#/g, '{#}')
+        .replace(/\+/g, '{+}')
+        .replace(/\^/g, '{^}')
+        .replace(/\\{/g, '{{}')
+        .replace(/\\}/g, '{}}')
+        .replace(/\n/g, '{enter}');
       runner.stdin.write(`sendInput;${toSend}\n`);
       await wait();
     },
@@ -380,17 +393,17 @@ module.exports = async function (path, hotkeysList, options) {
      * @param {{ msg: string, blind?: boolean} | string} x - The string to send
      */
     async sendPlay(x) {
-      if (typeof x === "string") x = { msg: x };
-      var toSend = "";
-      if (x.blind) toSend += "{Blind}";
+      if (typeof x === 'string') x = { msg: x };
+      var toSend = '';
+      if (x.blind) toSend += '{Blind}';
       toSend += x.msg
-        .replace(/!/g, "{!}")
-        .replace(/#/g, "{#}")
-        .replace(/\+/g, "{+}")
-        .replace(/\^/g, "{^}")
-        .replace(/\\{/g, "{{}")
-        .replace(/\\}/g, "{}}")
-        .replace(/\n/g, "{enter}");
+        .replace(/!/g, '{!}')
+        .replace(/#/g, '{#}')
+        .replace(/\+/g, '{+}')
+        .replace(/\^/g, '{^}')
+        .replace(/\\{/g, '{{}')
+        .replace(/\\}/g, '{}}')
+        .replace(/\n/g, '{enter}');
       runner.stdin.write(`sendPlay;${toSend}\n`);
       await wait();
     },
@@ -406,14 +419,19 @@ module.exports = async function (path, hotkeysList, options) {
      * Shuts down the computer
      */
     shutdown() {
-      runner.stdin.write("shutdown\n");
-    }
+      runner.stdin.write('shutdown\n');
+    },
   };
   if (options.defaultColorVariation) {
     ahk.defaultColorVariation = options.defaultColorVariation;
   }
-  const runner = spawn(path, [__dirname + "\\runner.ahk"]);
-  runner.stdin.write(process.cwd() + "\n");
+  const ahkV1Path = '\\ahk-v1-runner.ahk';
+  const ahkV2Path = '\\ahk-v2-runner.ahk';
+  // Defaults to AHK V2 [7/6/2023]
+  const runner = spawn(path, [
+    __dirname + (options.ahkV1 ? ahkV1Path : ahkV2Path),
+  ]);
+  runner.stdin.write(process.cwd() + '\n');
   var hotkeysString = `#NoTrayIcon
 stdout := FileOpen("*", "w \`n")
 
@@ -425,58 +443,59 @@ write(x) {
 `;
   hotkeysList.forEach(function (x) {
     if (x.noInterrupt) {
-      hotkeysString += "~";
+      hotkeysString += '~';
     }
-    if (typeof x === "string") {
+    if (typeof x === 'string') {
       hotkeysString += `${x}::write("${x}")
 `;
     } else {
       if (x.keys) {
-        ahk.hotkeys[x.keys.join(" ")] = function () { };
-        hotkeysString += `${x.keys.join(" & ")}::write("${x.keys.join(" ")}")
+        ahk.hotkeys[x.keys.join(' ')] = function () {};
+        hotkeysString += `${x.keys.join(' & ')}::write("${x.keys.join(' ')}")
 `;
       } else {
-        let mod = "";
+        let mod = '';
         if (x.modifiers) {
-          mod += x.modifiers.join("")
-            .replace("win", "#")
-            .replace("alt", "!")
-            .replace("control", "^")
-            .replace("shift", "+")
-            .replace("any", "*")
+          mod += x.modifiers
+            .join('')
+            .replace('win', '#')
+            .replace('alt', '!')
+            .replace('control', '^')
+            .replace('shift', '+')
+            .replace('any', '*');
         }
-        var key = x.key
-          .replace(/\\{/g, "{{}")
-          .replace(/\\}/g, "{}}");
-        ahk.hotkeys[mod + key] = function () { };
+        var key = x.key.replace(/\\{/g, '{{}').replace(/\\}/g, '{}}');
+        ahk.hotkeys[mod + key] = function () {};
         hotkeysString += `${mod + key}::write("${mod + key}")
 `;
       }
     }
   });
-  await fs.writeFile(__dirname + "\\hotkeys.ahk", hotkeysString);
-  const hotkeys = spawn(path, [__dirname + "\\hotkeys.ahk"]);
-  runner.stdout.on("end", process.exit);
-  hotkeys.stdout.on("end", process.exit);
-  process.on("SIGINT", process.exit);
-  process.on("exit", function () {
+  await fs.writeFile(__dirname + '\\hotkeys.ahk', hotkeysString);
+  const hotkeys = spawn(path, [__dirname + '\\hotkeys.ahk']);
+  runner.stdout.on('end', process.exit);
+  hotkeys.stdout.on('end', process.exit);
+  process.on('SIGINT', process.exit);
+  process.on('exit', function () {
     if (!runner.killed) runner.kill();
     if (!hotkeys.killed) hotkeys.kill();
   });
-  runner.stdout.on("data", function (data) {
+  runner.stdout.on('data', function (data) {
     data = data.toString();
     if (current) {
       current(data);
       current = null;
     }
   });
-  hotkeys.stdout.on("data", function (data) {
+  hotkeys.stdout.on('data', function (data) {
     data = data.toString();
     if (ahk.hotkeys[data].instant) ahk.hotkeys[data]();
     else ahk.hotkeysPending.push(ahk.hotkeys[data]);
   });
+
   var initVars = JSON.parse(await wait());
   ahk.width = initVars.width;
   ahk.height = initVars.height;
+  console.log(ahk);
   return ahk;
 };

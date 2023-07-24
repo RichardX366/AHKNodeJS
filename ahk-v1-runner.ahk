@@ -1,9 +1,9 @@
 #NoTrayIcon
-#MenuMaskKey vkE8
+A_MenuMaskKey := "vkFF"
 #UseHook
-CoordMode, Pixel, Screen
-CoordMode, Mouse, Screen
-SetBatchLines, -1
+CoordMode Pixel, Screen
+CoordMode Mouse, Screen
+
 stdin := FileOpen("*", "r `n")
 stdout := FileOpen("*", "w `n")
 write(x) {
@@ -21,53 +21,53 @@ initVars := "
 )"
 write(initVars)
 
-SetWorkingDir % RTrim(stdin.ReadLine(), "`n")
+SetWorkingDir % RTrim(stdin.ReadLine(), "`n") %
 
 Loop {
   x := RTrim(stdin.ReadLine(), "`n")
   data := StrSplit(x, ";")
   if (data[1] = "mouseMove") {
-    MouseMove, data[2], data[3], data[4]
+    MouseMove data[2], data[3], data[4]
     write("done")
   } else if (data[1] = "click") {
-    Click % data[2]
+    Click % data[2] %
     write("done")
   } else if (data[1] = "clickPlay") {
-    SendPlay % "{{}Click " data[2] "{}}"
+    SendPlay % "{{}Click " data[2] "{}}" %
     write("done")
   } else if (data[1] = "getClipboard") {
     write(clipboard)
   } else if (data[1] = "setClipboard") {
-    clipboard = % data[2]
+    clipboard := % data[2] %
     write("done")
   } else if (data[1] = "pixelSearch") {
-    PixelSearch, x, y, data[2], data[3], data[4], data[5], data[6], data[7], Fast RGB
+    PixelSearch x, y, data[2], data[3], data[4], data[5], data[6], [data[7], Fast RGB]
     write(x " " y)
   } else if (data[1] = "getPixelColor") {
-    PixelGetColor, color, data[2], data[3], % data[4]
+    PixelGetColor color, data[2], data[3], % data[4] %
     write(color)
   } else if (data[1] = "getMousePos") {
-    MouseGetPos, x, y
+    MouseGetPos x, y
     write(x " " y)
   } else if (data[1] = "imageSearch") {
-    ImageSearch, x, y, data[2], data[3], data[4], data[5], % data[6]
+    ImageSearch x, y, data[2], data[3], data[4], data[5], % data[6] %
     write(x " " y)
   } else if (data[1] = "setKeyDelay") {
-    SetKeyDelay, data[2], data[3], % data[4]
+    SetKeyDelay data[2], data[3], % data[4] %
     write("done")
   } else if (data[1] = "send") {
-    Send % data[2]
+    Send % data[2] %
     write("done")
   } else if (data[1] = "sendInput") {
-    SendInput % data[2]
+    SendInput % data[2] %
     write("done")
   } else if (data[1] = "sendPlay") {
-    SendPlay % data[2]
+    SendPlay % data[2] %
     write("done")
   } else if (data[1] = "setMouseSpeed") {
-    SetDefaultMouseSpeed % data[2]
+    SetDefaultMouseSpeed % data[2] %
     write("done")
   } else if (data[1] = "shutdown") {
-    Shutdown, 8
+    Shutdown 8
   }
 }
