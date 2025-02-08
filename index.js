@@ -355,9 +355,10 @@ module.exports = async function (path, hotkeysList, options) {
     },
     /**
      * Types out a string. Look at documentation for extra information.
-     * @param {{ msg: string, blind?: boolean} | string} x - The string to send
+     * @param {'send' | 'sendInput' | 'sendPlay'} sendType - type of "send" command
+     * @param {{ msg: string, blind?: boolean, raw?: boolean} | string} x - The string to send
      */
-    async send(x) {
+    async sendGeneric(sendType = 'send', x) {
       if (typeof x === 'string') x = { msg: x };
       var toSend = '';
       if (x.blind) toSend += '{Blind}';
@@ -369,46 +370,29 @@ module.exports = async function (path, hotkeysList, options) {
         .replace(/\\{/g, '{{}')
         .replace(/\\}/g, '{}}')
         .replace(/\n/g, '{enter}');
-      runner.stdin.write(formatCmd('send', toSend));
+      runner.stdin.write(formatCmd(sendType, toSend));
       await wait();
+    },
+    /**
+     * Types out a string. Look at documentation for extra information.
+     * @param {{ msg: string, blind?: boolean, raw?: boolean} | string} x - The string to send
+     */
+    async send(x) {
+      return sendGeneric('send', x);
     },
     /**
      * Types out a string using SendInput. Look at documentation for extra information.
      * @param {{ msg: string, blind?: boolean} | string} x - The string to send
      */
     async sendInput(x) {
-      if (typeof x === 'string') x = { msg: x };
-      var toSend = '';
-      if (x.blind) toSend += '{Blind}';
-      toSend += x.msg
-        .replace(/!/g, '{!}')
-        .replace(/#/g, '{#}')
-        .replace(/\+/g, '{+}')
-        .replace(/\^/g, '{^}')
-        .replace(/\\{/g, '{{}')
-        .replace(/\\}/g, '{}}')
-        .replace(/\n/g, '{enter}');
-      runner.stdin.write(formatCmd('sendInput', toSend));
-      await wait();
+      return sendGeneric('sendInput', x);
     },
     /**
      * Types out a string using SendPlay. Look at documentation for extra information.
      * @param {{ msg: string, blind?: boolean} | string} x - The string to send
      */
     async sendPlay(x) {
-      if (typeof x === 'string') x = { msg: x };
-      var toSend = '';
-      if (x.blind) toSend += '{Blind}';
-      toSend += x.msg
-        .replace(/!/g, '{!}')
-        .replace(/#/g, '{#}')
-        .replace(/\+/g, '{+}')
-        .replace(/\^/g, '{^}')
-        .replace(/\\{/g, '{{}')
-        .replace(/\\}/g, '{}}')
-        .replace(/\n/g, '{enter}');
-      runner.stdin.write(formatCmd('sendPlay', toSend));
-      await wait();
+      return sendGeneric('sendPlay', x);
     },
     /**
      * Sets the default mouse speed for clicks and mouseMove
