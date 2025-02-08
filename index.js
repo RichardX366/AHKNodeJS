@@ -35,6 +35,9 @@ module.exports = async function (path, hotkeysList, options) {
       current = resolve;
     });
   }
+  function formatCmd(...cmdAndArgs) {
+    return `${cmdAndArgs.join('!;')}\n`;
+  }
   var current = null;
   const ahk = {
     defaultColorVariation: 1,
@@ -136,7 +139,7 @@ module.exports = async function (path, hotkeysList, options) {
         x.x = Math.floor((x.x / 100) * ahk.width);
         x.y = Math.floor((x.y / 100) * ahk.height);
       }
-      runner.stdin.write(`mouseMove;${x.x};${x.y};${x.speed}\n`);
+      runner.stdin.write(formatCmd('mouseMove', x.x, x.y, x.speed));
       await wait();
     },
     /**
@@ -171,7 +174,7 @@ module.exports = async function (path, hotkeysList, options) {
       else x.state = '';
       if (!x.count) x.count = '';
       runner.stdin.write(
-        `click;${x.x} ${x.y} ${x.button} ${x.state} ${x.count}\n`,
+        formatCmd('click', `${x.x} ${x.y} ${x.button} ${x.state} ${x.count}`)
       );
       await wait();
     },
@@ -207,7 +210,7 @@ module.exports = async function (path, hotkeysList, options) {
       else x.state = '';
       if (!x.count) x.count = '';
       runner.stdin.write(
-        `clickPlay;${x.x} ${x.y} ${x.button} ${x.state} ${x.count}\n`,
+        formatCmd('clickPlay', `${x.x} ${x.y} ${x.button} ${x.state} ${x.count}`)
       );
       await wait();
     },
@@ -218,10 +221,10 @@ module.exports = async function (path, hotkeysList, options) {
      */
     async clipboard(x) {
       if (x) {
-        runner.stdin.write(`setClipboard;${x}\n`);
+        runner.stdin.write(formatCmd('setClipboard', x));
         await wait();
       } else {
-        runner.stdin.write(`getClipboard\n`);
+        runner.stdin.write(formatCmd('getClipboard'));
         return await wait();
       }
     },
@@ -247,7 +250,7 @@ module.exports = async function (path, hotkeysList, options) {
         x.y2 = Math.floor((x.y2 / 100) * ahk.height);
       }
       runner.stdin.write(
-        `pixelSearch;${x.x1};${x.y1};${x.x2};${x.y2};0x${x.color};${x.variation}\n`,
+        formatCmd('pixelSearch', x.x1, x.y1, x.x2, x.y2, `0x${x.color}`, x.variation)
       );
       var pos = (await wait()).split(' ');
       if (pos[0] === '') {
@@ -277,7 +280,7 @@ module.exports = async function (path, hotkeysList, options) {
       var mode = 'RGB ';
       if (x.mode === 'slow') mode += 'Slow';
       else if (x.mode === 'alt') mode += 'Alt';
-      runner.stdin.write(`getPixelColor;${x.x};${x.y};${mode}\n`);
+      runner.stdin.write(formatCmd('getPixelColor', x.x, x.y, mode));
       return (await wait()).replace('0x', '');
     },
     /**
@@ -286,7 +289,7 @@ module.exports = async function (path, hotkeysList, options) {
      * @returns [x, y] If % positioning is used, they are returned as screen percentages.
      */
     async getMousePos(x) {
-      runner.stdin.write(`getMousePos\n`);
+      runner.stdin.write(formatCmd('getMousePos'));
       var pos = (await wait()).split(' ');
       pos[0] = Number(pos[0]);
       pos[1] = Number(pos[1]);
@@ -322,7 +325,7 @@ module.exports = async function (path, hotkeysList, options) {
         x.y2 = Math.floor((x.y2 / 100) * ahk.height);
       }
       runner.stdin.write(
-        `imageSearch;${x.x1};${x.y1};${x.x2};${x.y2};${x.variation}${x.trans}${x.imgPath}\n`,
+        formatCmd('imageSearch', x.x1, x.y1, x.x2, x.y2, x.variation, x.trans, x.imgPath)
       );
       var pos = (await wait()).split(' ');
       if (pos[0] === '') {
@@ -347,7 +350,7 @@ module.exports = async function (path, hotkeysList, options) {
       if (!x.duration) x.duration = '';
       if (x.play) x.play = 'Play';
       else x.play = '';
-      runner.stdin.write(`setKeyDelay;${x.delay};${x.duration};${x.play}\n`);
+      runner.stdin.write(formatCmd('setKeyDelay', x.delay, x.duration, x.play));
       await wait();
     },
     /**
@@ -366,7 +369,7 @@ module.exports = async function (path, hotkeysList, options) {
         .replace(/\\{/g, '{{}')
         .replace(/\\}/g, '{}}')
         .replace(/\n/g, '{enter}');
-      runner.stdin.write(`send;${toSend}\n`);
+      runner.stdin.write(formatCmd('send', toSend));
       await wait();
     },
     /**
@@ -385,7 +388,7 @@ module.exports = async function (path, hotkeysList, options) {
         .replace(/\\{/g, '{{}')
         .replace(/\\}/g, '{}}')
         .replace(/\n/g, '{enter}');
-      runner.stdin.write(`sendInput;${toSend}\n`);
+      runner.stdin.write(formatCmd('sendInput', toSend));
       await wait();
     },
     /**
@@ -404,7 +407,7 @@ module.exports = async function (path, hotkeysList, options) {
         .replace(/\\{/g, '{{}')
         .replace(/\\}/g, '{}}')
         .replace(/\n/g, '{enter}');
-      runner.stdin.write(`sendPlay;${toSend}\n`);
+      runner.stdin.write(formatCmd('sendPlay', toSend));
       await wait();
     },
     /**
@@ -412,14 +415,14 @@ module.exports = async function (path, hotkeysList, options) {
      * @param {number} x - The mouse speed from 0 - 100
      */
     async setMouseSpeed(x) {
-      runner.stdin.write(`setMouseSpeed;${x}\n`);
+      runner.stdin.write(formatCmd('setMouseSpeed', x));
       await wait();
     },
     /**
      * Shuts down the computer
      */
     shutdown() {
-      runner.stdin.write('shutdown\n');
+      runner.stdin.write(formatCmd('shutdown'));
     },
   };
   if (options.defaultColorVariation) {
