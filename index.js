@@ -358,7 +358,7 @@ module.exports = async function (path, hotkeysList, options) {
      * @param {'send' | 'sendInput' | 'sendPlay'} sendType - type of "send" command
      * @param {{ msg: string, blind?: boolean, raw?: boolean} | string} x - The string to send
      */
-    async sendGeneric(sendType = 'send', x) {
+    async sendGeneric(sendType, x) {
       if (typeof x === 'string') x = { msg: x };
       var toSend = '';
       if (x.blind) toSend += '{Blind}';
