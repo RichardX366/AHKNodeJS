@@ -4,7 +4,7 @@ A_MenuMaskKey := "vkE8"
 CoordMode("Pixel", "Screen")
 CoordMode("Mouse", "Screen")
 
-stdin1 := FileOpen("*", "r `n")
+stdin1 := FileOpen("*", "r `n", "UTF-8")
 stdout1 := FileOpen("*", "w `n")
 write(x) {
   global stdout1
@@ -25,7 +25,7 @@ SetWorkingDir(RTrim(stdin1.ReadLine(), "`n"))
 
 Loop{
   x := RTrim(stdin1.ReadLine(), "`n")
-  data := StrSplit(x, ";")
+  data := StrSplit(x, "!;")
   if (data[1] = "mouseMove") {
     MouseMove(data[2], data[3], data[4])
     write("done")

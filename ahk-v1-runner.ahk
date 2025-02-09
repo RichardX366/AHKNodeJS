@@ -4,7 +4,7 @@ A_MenuMaskKey := "vkFF"
 CoordMode Pixel, Screen
 CoordMode Mouse, Screen
 
-stdin := FileOpen("*", "r `n")
+stdin := FileOpen("*", "r `n", "UTF-8")
 stdout := FileOpen("*", "w `n")
 write(x) {
   global stdout
@@ -25,7 +25,7 @@ SetWorkingDir % RTrim(stdin.ReadLine(), "`n") %
 
 Loop {
   x := RTrim(stdin.ReadLine(), "`n")
-  data := StrSplit(x, ";")
+  data := StrSplit(x, "!;")
   if (data[1] = "mouseMove") {
     MouseMove data[2], data[3], data[4]
     write("done")
