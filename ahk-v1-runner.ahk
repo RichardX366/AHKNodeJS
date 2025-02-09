@@ -25,16 +25,16 @@ SetWorkingDir % RTrim(stdin.ReadLine(), "`n") %
 
 ; joins array elements with given separator, starting from given index
 JoinSubArray(sep, start, strings*) {
-  str := ""
+  out := ""
   for index,str in strings {
     if (index >= start) {
       if (index >= start + 1) {
-        str .= sep
+        out .= sep
       }
-      str .= str
+      out .= str
     }
   }
-  return str
+  return out
 }
 
 Loop {
@@ -52,7 +52,7 @@ Loop {
   } else if (data[1] = "getClipboard") {
     write(clipboard)
   } else if (data[1] = "setClipboard") {
-    clipboard := % JoinSubArray(";", 2, data) %
+    clipboard := % JoinSubArray(";", 2, data*) %
     write("done")
   } else if (data[1] = "pixelSearch") {
     PixelSearch x, y, data[2], data[3], data[4], data[5], data[6], [data[7], Fast RGB]
@@ -70,13 +70,13 @@ Loop {
     SetKeyDelay data[2], data[3], % data[4] %
     write("done")
   } else if (data[1] = "send") {
-    Send % JoinSubArray(";", 2, data) %
+    Send % JoinSubArray(";", 2, data*) %
     write("done")
   } else if (data[1] = "sendInput") {
-    SendInput % JoinSubArray(";", 2, data) %
+    SendInput % JoinSubArray(";", 2, data*) %
     write("done")
   } else if (data[1] = "sendPlay") {
-    SendPlay % JoinSubArray(";", 2, data) %
+    SendPlay % JoinSubArray(";", 2, data*) %
     write("done")
   } else if (data[1] = "setMouseSpeed") {
     SetDefaultMouseSpeed % data[2] %
