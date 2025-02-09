@@ -25,13 +25,15 @@ SetWorkingDir(RTrim(stdin1.ReadLine(), "`n"))
 
 ; joins array elements with given separator, starting from given index
 JoinSubArray(sep, start, strings*) {
-  for index,str in strings
+  str := ""
+  for index,str in strings {
     if (index >= start) {
       if (index >= start + 1) {
         str .= sep
       }
       str .= str
     }
+  }
   return str
 }
 
