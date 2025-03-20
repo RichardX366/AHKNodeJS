@@ -134,7 +134,7 @@ module.exports = async function (path, hotkeysList, options) {
      * }} x - The Parameters
      */
     async mouseMove(x) {
-      if (!x.speed) x.speed = '';
+      if (!x.speed) x.speed = '1';
       if (x.positioning === '%') {
         x.x = Math.floor((x.x / 100) * ahk.width);
         x.y = Math.floor((x.y / 100) * ahk.height);
@@ -362,14 +362,8 @@ module.exports = async function (path, hotkeysList, options) {
       if (typeof x === 'string') x = { msg: x };
       var toSend = '';
       if (x.blind) toSend += '{Blind}';
-      toSend += x.msg
-        .replace(/!/g, '{!}')
-        .replace(/#/g, '{#}')
-        .replace(/\+/g, '{+}')
-        .replace(/\^/g, '{^}')
-        .replace(/\\{/g, '{{}')
-        .replace(/\\}/g, '{}}')
-        .replace(/\n/g, '{enter}');
+      if (x.raw) toSend += '{Raw}';
+      toSend += x.msg.replace(/\n/g, '`n');
       runner.stdin.write(formatCmd(sendType, toSend));
       await wait();
     },
@@ -378,21 +372,21 @@ module.exports = async function (path, hotkeysList, options) {
      * @param {{ msg: string, blind?: boolean, raw?: boolean} | string} x - The string to send
      */
     async send(x) {
-      return sendGeneric('send', x);
+      return this.sendGeneric('send', x);
     },
     /**
      * Types out a string using SendInput. Look at documentation for extra information.
      * @param {{ msg: string, blind?: boolean} | string} x - The string to send
      */
     async sendInput(x) {
-      return sendGeneric('sendInput', x);
+      return this.sendGeneric('sendInput', x);
     },
     /**
      * Types out a string using SendPlay. Look at documentation for extra information.
      * @param {{ msg: string, blind?: boolean} | string} x - The string to send
      */
     async sendPlay(x) {
-      return sendGeneric('sendPlay', x);
+      return this.sendGeneric('sendPlay', x);
     },
     /**
      * Sets the default mouse speed for clicks and mouseMove
