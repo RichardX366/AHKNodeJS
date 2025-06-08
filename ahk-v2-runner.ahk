@@ -23,9 +23,23 @@ write(initVars)
 
 SetWorkingDir(RTrim(stdin1.ReadLine(), "`n"))
 
+; joins array elements with given separator, starting from given index
+JoinSubArray(sep, start, strings*) {
+  out := ""
+  for index,str in strings {
+    if (index >= start) {
+      if (index >= start + 1) {
+        out .= sep
+      }
+      out .= str
+    }
+  }
+  return out
+}
+
 Loop{
   x := RTrim(stdin1.ReadLine(), "`n")
-  data := StrSplit(x, "!;")
+  data := StrSplit(x, ";")
   if (data[1] = "mouseMove") {
     MouseMove(data[2], data[3], data[4])
     write("done")
@@ -38,7 +52,7 @@ Loop{
   } else if (data[1] = "getClipboard") {
     write(A_Clipboard)
   } else if (data[1] = "setClipboard") {
-    A_Clipboard := data[2]
+    A_Clipboard := JoinSubArray(";", 2, data*)
     write("done")
   } else if (data[1] = "pixelSearch") {
     ErrorLevel := !PixelSearch(&x, &y, data[2], data[3], data[4], data[5], data[6], [data[7], "Fast RGB"]) ;V1toV2: Switched from BGR to RGB values
@@ -56,13 +70,14 @@ Loop{
     SetKeyDelay(data[2], data[3], data[4])
     write("done")
   } else if (data[1] = "send") {
-    Send(data[2])
+    ; MsgBox(JoinSubArray(";", 2, data))
+    Send(JoinSubArray(";", 2, data*))
     write("done")
   } else if (data[1] = "sendInput") {
-    SendInput(data[2])
+    SendInput(JoinSubArray(";", 2, data*))
     write("done")
   } else if (data[1] = "sendPlay") {
-    SendPlay(data[2])
+    SendPlay(JoinSubArray(";", 2, data*))
     write("done")
   } else if (data[1] = "setMouseSpeed") {
     SetDefaultMouseSpeed(data[2])

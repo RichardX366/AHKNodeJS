@@ -36,7 +36,7 @@ module.exports = async function (path, hotkeysList, options) {
     });
   }
   function formatCmd(...cmdAndArgs) {
-    return `${cmdAndArgs.join('!;')}\n`;
+    return `${cmdAndArgs.join(';')}\n`;
   }
   var current = null;
   const ahk = {
@@ -356,11 +356,11 @@ module.exports = async function (path, hotkeysList, options) {
     /**
      * Types out a string. Look at documentation for extra information.
      * @param {'send' | 'sendInput' | 'sendPlay'} sendType - type of "send" command
-     * @param {{ msg: string, blind?: boolean, raw?: boolean} | string} x - The string to send
+     * @param {{ msg: string, blind?: boolean } | string} x - The string to send
      */
     async sendGeneric(sendType, x) {
       if (typeof x === 'string') x = { msg: x };
-      var toSend = '';
+      let toSend = '';
       if (x.blind) toSend += '{Blind}';
       toSend += x.msg
         .replace(/!/g, '{!}')
@@ -375,24 +375,24 @@ module.exports = async function (path, hotkeysList, options) {
     },
     /**
      * Types out a string. Look at documentation for extra information.
-     * @param {{ msg: string, blind?: boolean, raw?: boolean} | string} x - The string to send
+     * @param {{ msg: string, blind?: boolean } | string} x - The string to send
      */
     async send(x) {
-      return sendGeneric('send', x);
+      return ahk.sendGeneric('send', x);
     },
     /**
      * Types out a string using SendInput. Look at documentation for extra information.
-     * @param {{ msg: string, blind?: boolean} | string} x - The string to send
+     * @param {{ msg: string, blind?: boolean } | string} x - The string to send
      */
     async sendInput(x) {
-      return sendGeneric('sendInput', x);
+      return ahk.sendGeneric('sendInput', x);
     },
     /**
      * Types out a string using SendPlay. Look at documentation for extra information.
-     * @param {{ msg: string, blind?: boolean} | string} x - The string to send
+     * @param {{ msg: string, blind?: boolean } | string} x - The string to send
      */
     async sendPlay(x) {
-      return sendGeneric('sendPlay', x);
+      return ahk.sendGeneric('sendPlay', x);
     },
     /**
      * Sets the default mouse speed for clicks and mouseMove
